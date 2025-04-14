@@ -1,1 +1,4 @@
-# enlp_final_curriculum_learning
+# ENLP Final Curriculum Learning
+
+## Developed in python3.11
+
