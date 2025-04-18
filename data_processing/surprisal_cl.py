@@ -46,6 +46,7 @@ def local_surprisal(phrase:str, trigram_dict:Dict):
     if probs is None:
         probs = generate_trigram_probabilities()
     tokenized_phrase = tokenize(phrase)
+    
     ...
 def model_based_surprisal():
     """
