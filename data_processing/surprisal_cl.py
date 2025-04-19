@@ -66,9 +66,11 @@ def model_based_surprisal(model, tokenizer, phrase):
     """
     with torch.no_grad():
         input = tokenizer(phrase, return_tensors="pt")
-        generated_outputs = model(input, output_scores=True)
-        ...
-
+        generated_outputs = model(input.input_ids, output_scores=True)
+        probs = [torch.nn.functional.softmax(generated_outputs.logits[0, i, :], dim = 0)[input_id].item() for i, input_id in enumerate(input.input_ids[0])]
+    surprisal = [-math.log2(prob) for prob in probs]
+    phrase_surprisal = sum(surprisal)
+    return phrase_surprisal
 def create_curricula(df: pd.DataFrame, split: str = "train"):
     """
         Split dataframes into easy, medium, hard curricula
@@ -77,24 +79,23 @@ def create_curricula(df: pd.DataFrame, split: str = "train"):
     scores = df.surprisal.to_list()
     zipped_list = list(zip(phrases, scores))
     zipped_list.sort(key=lambda x: x[1])
+    zipped_list = [z for z in zipped_list if z[0].strip() != ""]
     easy_idx = int(len(zipped_list) * (1/3))
     medium_idx = int(len(zipped_list) * (2/3))
-    with open(f"./data/easy/{split}.{split}", "w") as f:
-        easy_str = " ".join([z[0] for z in zipped_list[:easy_idx]])
+    with open(f"./surprisal_curricula_local/easy/{split}.{split}", "w") as f:
+        easy_str = "".join([z[0] for z in zipped_list[:easy_idx]])
         f.write(easy_str)
         f.close()
-    with open(f"./data/medium/{split}.{split}", "w") as f:
-        medium_str = " ".join([z[0] for z in zipped_list[:medium_idx]])
+    with open(f"./surprisal_curricula_local/medium/{split}.{split}", "w") as f:
+        medium_str = "".join([z[0] for z in zipped_list[:medium_idx]])
         f.write(medium_str)
         f.close()
-    with open(f"./data/hard/{split}.{split}", "w") as f:
-        hard_str = " ".join([z[0] for z in zipped_list])
+    with open(f"./surprisal_curricula_local/hard/{split}.{split}", "w") as f:
+        hard_str = "".join([z[0] for z in zipped_list])
         f.write(hard_str)
         f.close()
 
-def main():
-    surprisal_mode = "local" # "local" or "model"
-    pickle_file = "./trigram_probabilities.pkl"
+def main(surprisal_mode:str = "local"):
     train = []
     dev = []
     print("loading training corpus")
@@ -108,6 +109,7 @@ def main():
 
     if surprisal_mode == "local":
         print("loading trigram probs")
+        pickle_file = "./trigram_probabilities.pkl" # I already generated this and saved it off locally, set to None if you need to regenerate
         if pickle_file is None:
             train_trigram_probability_table = generate_trigram_probabilities(train)
         else:
@@ -125,8 +127,22 @@ def main():
     else:
         model = AutoModelForCausalLM.from_pretrained("gpt2", return_dict_in_generate=True)
         tokenizer = AutoTokenizer.from_pretrained("gpt2")
+        print("calculating dev surprisal")
+        dev_rows = [[phrase,  model_based_surprisal(model, tokenizer,phrase)] for phrase in tqdm(dev)]
+        dev_df = pd.DataFrame(dev_rows, columns=["phrase", "surprisal"])
+        dev_df.to_csv("dev_model_surprisal.csv", index=False)
+        print("calculating train surprisal")
+        train_rows = [[phrase, model_based_surprisal(model, tokenizer,phrase)] for phrase in tqdm(train)]
+        train_df = pd.DataFrame(train_rows, columns=["phrase", "surprisal"])
+        train_df.to_csv("train_model_surprisal.csv", index=False)
 if __name__=="__main__":
+    # uncomment this to calculate dataframes of surprisal for the splits
+    # surprisal_mode = "model" # "local" or "model
+    # main(surprisal_mode=surprisal_mode)
+
+    # uncomment this code to actually split the data up into curricula based on surprisal
+
     train_df = pd.read_csv("./curriculum_learning/train_local_surprisal.csv")
     create_curricula(train_df, split="train")
-    # dev_df = pd.read_csv("./curriculum_learning/dev_local_surprisal.csv")
-    # create_curricula(dev_df, split="dev")
+    dev_df = pd.read_csv("./curriculum_learning/dev_local_surprisal.csv")
+    create_curricula(dev_df, split="dev")

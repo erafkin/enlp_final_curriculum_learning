@@ -1,18 +1,18 @@
 
-from transformers import RobertaTokenizer, RobertaForMaskedLM, RobertaConfig, DataCollatorForLanguageModeling, Trainer, TrainingArguments
+from transformers import RobertaTokenizerFast, RobertaForMaskedLM, RobertaConfig, DataCollatorForLanguageModeling, Trainer, TrainingArguments
 import os
 from datasets import Dataset, load_dataset
 import math
 
 def train_model(mlm_prob: float = 0.15):
-    tokenizer = RobertaTokenizer.from_pretrained("FacebookAI/roberta-base")
-    configuration = RobertaConfig()
+    tokenizer = RobertaTokenizerFast.from_pretrained("phueb/BabyBERTa-1")
+    configuration = RobertaConfig.from_pretrained("phueb/BabyBERTa-1")
     model = RobertaForMaskedLM(configuration)
 
     tokenizer.pad_token = tokenizer.eos_token
     data_folder = "./surprisal_curricula_local"
     def preprocess_function(examples):
-        return tokenizer(examples["text"])
+        return tokenizer(examples["text"], padding="max_length", truncation=True, max_length=512)
     
     data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm_probability=mlm_prob)
     for curricula in os.listdir(data_folder):
@@ -37,7 +37,7 @@ def train_model(mlm_prob: float = 0.15):
             model=model,
             args=training_args,
             train_dataset=lm_dataset["train"],
-            eval_dataset=lm_dataset["val"], #TODO uncomment
+            eval_dataset=lm_dataset["val"],
             data_collator=data_collator,
             tokenizer=tokenizer,
         )
