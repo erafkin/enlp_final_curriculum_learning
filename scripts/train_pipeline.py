@@ -42,8 +42,10 @@ def train_model(mlm_prob: float = 0.15):
             tokenizer=tokenizer,
         )
         trainer.train()
+        trainer.save_model(f"curriculum_learning/{curricula}")
+        model = trainer.model
     eval_results = trainer.evaluate()
-    model.save_model("curriculum_learning")
+    trainer.save_model("curriculum_learning/final")
     print(f"Perplexity: {math.exp(eval_results['eval_loss']):.2f}")
 
 if __name__ == "__main__":
