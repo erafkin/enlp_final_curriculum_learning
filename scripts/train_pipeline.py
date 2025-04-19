@@ -25,7 +25,7 @@ def train_model(mlm_prob: float = 0.15):
 
         training_args = TrainingArguments(
             output_dir="curriculum_learning",
-            eval_strategy="epoch", # TODO: Change to "epoch"
+            eval_strategy="epoch",
             learning_rate=2e-5,
             num_train_epochs=10, # TODO: increase
             weight_decay=0.01,
@@ -36,7 +36,7 @@ def train_model(mlm_prob: float = 0.15):
         trainer = Trainer(
             model=model,
             args=training_args,
-            train_dataset=lm_dataset["test"],
+            train_dataset=lm_dataset["train"],
             eval_dataset=lm_dataset["val"], #TODO uncomment
             data_collator=data_collator,
             tokenizer=tokenizer,
