@@ -5,7 +5,8 @@ import math
 import pandas as pd
 from tqdm import tqdm
 import pickle
-
+from transformers import AutoModelForCausalLM, AutoTokenizer
+import torch 
 def tokenize(text: str):
     # Basic tokenizer: lowercase and split on non-word characters
     return re.findall(r'\b\w+\b', text.lower())
@@ -58,12 +59,38 @@ def local_surprisal(phrase:str, trigram_dict:Dict):
     phrase_surprisal = sum(surprisal)
     return phrase_surprisal
 
-def model_based_surprisal():
+def model_based_surprisal(model, tokenizer, phrase):
     """
         quantify suprisal using probabilities from a large model
         I would argue that this is ok because such labeling is allowed in POS tagg/ing etc. 
     """
-    ...
+    with torch.no_grad():
+        input = tokenizer(phrase, return_tensors="pt")
+        generated_outputs = model(input, output_scores=True)
+        ...
+
+def create_curricula(df: pd.DataFrame, split: str = "train"):
+    """
+        Split dataframes into easy, medium, hard curricula
+    """
+    phrases = df.phrase.to_list()
+    scores = df.surprisal.to_list()
+    zipped_list = list(zip(phrases, scores))
+    zipped_list.sort(key=lambda x: x[1])
+    easy_idx = int(len(zipped_list) * (1/3))
+    medium_idx = int(len(zipped_list) * (2/3))
+    with open(f"./data/easy/{split}.{split}", "w") as f:
+        easy_str = " ".join([z[0] for z in zipped_list[:easy_idx]])
+        f.write(easy_str)
+        f.close()
+    with open(f"./data/medium/{split}.{split}", "w") as f:
+        medium_str = " ".join([z[0] for z in zipped_list[:medium_idx]])
+        f.write(medium_str)
+        f.close()
+    with open(f"./data/hard/{split}.{split}", "w") as f:
+        hard_str = " ".join([z[0] for z in zipped_list])
+        f.write(hard_str)
+        f.close()
 
 def main():
     surprisal_mode = "local" # "local" or "model"
@@ -95,5 +122,11 @@ def main():
         train_df.to_csv("train_local_surprisal.csv", index=False)
         dev_df = pd.DataFrame(dev_rows, columns=["phrase", "surprisal"])
         dev_df.to_csv("dev_local_surprisal.csv", index=False)
+    else:
+        model = AutoModelForCausalLM.from_pretrained("gpt2", return_dict_in_generate=True)
+        tokenizer = AutoTokenizer.from_pretrained("gpt2")
 if __name__=="__main__":
-    main()
+    train_df = pd.read_csv("./curriculum_learning/train_local_surprisal.csv")
+    create_curricula(train_df, split="train")
+    # dev_df = pd.read_csv("./curriculum_learning/dev_local_surprisal.csv")
+    # create_curricula(dev_df, split="dev")

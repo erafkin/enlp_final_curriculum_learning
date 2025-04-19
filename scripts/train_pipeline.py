@@ -10,13 +10,13 @@ def train_model(mlm_prob: float = 0.15):
     model = RobertaForMaskedLM(configuration)
 
     tokenizer.pad_token = tokenizer.eos_token
-    data_folder = ""
+    data_folder = "./surprisal_curricula_local"
     def preprocess_function(examples):
         return tokenizer(examples["text"])
     
     data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm_probability=mlm_prob)
     for curricula in os.listdir(data_folder):
-        lm_dataset = load_dataset("text", data_files={"test": "data/{curricula}/test/test.test"}) # TODO: create train, val, test files that are a combo of all of the files in the data split 
+        lm_dataset = load_dataset("text", data_files={"train": f"{data_folder}/{curricula}/train.train", "val":f"{data_folder}/{curricula}/dev.dev"}) 
         lm_dataset = lm_dataset.map(
             preprocess_function,
             batched=True,
@@ -27,7 +27,7 @@ def train_model(mlm_prob: float = 0.15):
             output_dir="curriculum_learning",
             eval_strategy="epoch",
             learning_rate=2e-5,
-            num_train_epochs=10, # TODO: increase
+            num_train_epochs=5, # TODO: increase
             weight_decay=0.01,
             push_to_hub=False,
             save_strategy="epoch"
