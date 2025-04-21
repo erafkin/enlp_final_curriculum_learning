@@ -71,6 +71,7 @@ def model_based_surprisal(model, tokenizer, phrase):
     surprisal = [-math.log2(prob) for prob in probs]
     phrase_surprisal = sum(surprisal)
     return phrase_surprisal
+
 def create_curricula(df: pd.DataFrame, split: str = "train"):
     """
         Split dataframes into easy, medium, hard curricula
@@ -82,15 +83,15 @@ def create_curricula(df: pd.DataFrame, split: str = "train"):
     zipped_list = [z for z in zipped_list if z[0].strip() != ""]
     easy_idx = int(len(zipped_list) * (1/3))
     medium_idx = int(len(zipped_list) * (2/3))
-    with open(f"./surprisal_curricula_local/easy/{split}.{split}", "w") as f:
+    with open(f"./surprisal_curricula_local_10M/easy/{split}.{split}", "w") as f:
         easy_str = "".join([z[0] for z in zipped_list[:easy_idx]])
         f.write(easy_str)
         f.close()
-    with open(f"./surprisal_curricula_local/medium/{split}.{split}", "w") as f:
+    with open(f"./surprisal_curricula_local_10M/medium/{split}.{split}", "w") as f:
         medium_str = "".join([z[0] for z in zipped_list[:medium_idx]])
         f.write(medium_str)
         f.close()
-    with open(f"./surprisal_curricula_local/hard/{split}.{split}", "w") as f:
+    with open(f"./surprisal_curricula_local_10M/hard/{split}.{split}", "w") as f:
         hard_str = "".join([z[0] for z in zipped_list])
         f.write(hard_str)
         f.close()
@@ -99,7 +100,7 @@ def main(surprisal_mode:str = "local"):
     train = []
     dev = []
     print("loading training corpus")
-    with open("./data/train_100M/train.train", "r") as f:
+    with open("./data/train_10M/train.train", "r") as f:
         train = f.readlines()
         f.close()
     print("loading dev corpus")
@@ -109,7 +110,7 @@ def main(surprisal_mode:str = "local"):
 
     if surprisal_mode == "local":
         print("loading trigram probs")
-        pickle_file = "./trigram_probabilities.pkl" # I already generated this and saved it off locally, set to None if you need to regenerate
+        pickle_file = None #"./curriculum_learning/trigram_probabilities.pkl" # I already generated this and saved it off locally, set to None if you need to regenerate
         if pickle_file is None:
             train_trigram_probability_table = generate_trigram_probabilities(train)
         else:
@@ -121,9 +122,9 @@ def main(surprisal_mode:str = "local"):
         print("calculating dev surprisal")
         dev_rows = [[phrase, local_surprisal(phrase, train_trigram_probability_table)] for phrase in tqdm(dev)]
         train_df = pd.DataFrame(train_rows, columns=["phrase", "surprisal"])
-        train_df.to_csv("train_local_surprisal.csv", index=False)
+        train_df.to_csv("train_local_surprisal_10M.csv", index=False)
         dev_df = pd.DataFrame(dev_rows, columns=["phrase", "surprisal"])
-        dev_df.to_csv("dev_local_surprisal.csv", index=False)
+        dev_df.to_csv("dev_local_surprisal_10M.csv", index=False)
     else:
         model = AutoModelForCausalLM.from_pretrained("gpt2", return_dict_in_generate=True)
         tokenizer = AutoTokenizer.from_pretrained("gpt2")
@@ -137,12 +138,12 @@ def main(surprisal_mode:str = "local"):
         train_df.to_csv("train_model_surprisal.csv", index=False)
 if __name__=="__main__":
     # uncomment this to calculate dataframes of surprisal for the splits
-    # surprisal_mode = "model" # "local" or "model
-    # main(surprisal_mode=surprisal_mode)
+    surprisal_mode = "model" # "local" or "model
+    main(surprisal_mode=surprisal_mode)
 
     # uncomment this code to actually split the data up into curricula based on surprisal
 
-    train_df = pd.read_csv("./curriculum_learning/train_local_surprisal.csv")
-    create_curricula(train_df, split="train")
-    dev_df = pd.read_csv("./curriculum_learning/dev_local_surprisal.csv")
-    create_curricula(dev_df, split="dev")
+    # train_df = pd.read_csv("./curriculum_learning/train_local_surprisal_10M.csv")
+    # create_curricula(train_df, split="train")
+    # dev_df = pd.read_csv("./curriculum_learning/dev_local_surprisal_10M.csv")
+    # create_curricula(dev_df, split="dev")

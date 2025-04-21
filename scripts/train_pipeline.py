@@ -15,7 +15,7 @@ def train_model(mlm_prob: float = 0.15):
         return tokenizer(examples["text"], padding="max_length", truncation=True, max_length=128)
     
     data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm_probability=mlm_prob)
-    for curricula in os.listdir(data_folder):
+    for curricula in ["easy", "medium", "hard"]:
         lm_dataset = load_dataset("text", data_files={"train": f"{data_folder}/{curricula}/train.train", "val":f"{data_folder}/{curricula}/dev.dev"}) 
         lm_dataset = lm_dataset.map(
             preprocess_function,
