@@ -81,7 +81,7 @@ def create_curricula(df: pd.DataFrame, split: str = "train"):
     zipped_list = list(zip(phrases, scores))
     zipped_list.sort(key=lambda x: x[1])
     zipped_list = [z for z in zipped_list if z[0].strip() != ""]
-    easy_idx = int(len(zipped_list) * (1/3))
+    easy_idx = int(len(zipped_list) * (1/3)) # 3 curricula hard coded
     medium_idx = int(len(zipped_list) * (2/3))
     with open(f"./surprisal_curricula_local_10M/easy/{split}.{split}", "w") as f:
         easy_str = "".join([z[0] for z in zipped_list[:easy_idx]])
@@ -143,7 +143,7 @@ if __name__=="__main__":
 
     # uncomment this code to actually split the data up into curricula based on surprisal
 
-    # train_df = pd.read_csv("./curriculum_learning/train_local_surprisal_10M.csv")
-    # create_curricula(train_df, split="train")
-    # dev_df = pd.read_csv("./curriculum_learning/dev_local_surprisal_10M.csv")
-    # create_curricula(dev_df, split="dev")
+    train_df = pd.read_csv("./curriculum_learning/train_local_surprisal_10M.csv")
+    create_curricula(train_df, split="train")
+    dev_df = pd.read_csv("./curriculum_learning/dev_local_surprisal_10M.csv")
+    create_curricula(dev_df, split="dev")
