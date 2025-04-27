@@ -10,13 +10,13 @@ def train_model(mlm_prob: float = 0.15):
     model = AutoModelForMaskedLM.from_config(configuration)
 
     tokenizer.pad_token = tokenizer.eos_token
-    data_folder = ... #TODO Swap out with the folder where your curricula data are saved. Mine have "easy", "medium", "hard" folders and each of those have a train.train and dev.dev file
+    data_folder = "data/aggregated_test"
     def preprocess_function(examples):
         return tokenizer(examples["text"], padding="max_length", truncation=True, max_length=128)
     
     data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm_probability=mlm_prob)
     for curricula in ["easy", "medium", "hard"]:
-        lm_dataset = load_dataset("text", data_files={"train": f"{data_folder}/{curricula}/train.train", "val":f"{data_folder}/{curricula}/dev.dev"}) 
+        lm_dataset = load_dataset("text", data_files={"train": f"{data_folder}/train.train", "val":f"{data_folder}/dev.dev"}) 
         lm_dataset = lm_dataset.map(
             preprocess_function,
             batched=True,
