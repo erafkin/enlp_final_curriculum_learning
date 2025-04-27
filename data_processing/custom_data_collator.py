@@ -270,4 +270,11 @@ class UsasTagAwareDataCollator(DataCollatorForLanguageModeling):
         batch['input_ids'] = inputs
         batch['labels'] = labels
 
+        # Remove original text field as it's not needed by the model and might cause issues
+        if 'text' in batch:
+            del batch['text']
+        # Also remove word_ids if it was added as a tensor and might be problematic
+        # Note: We used padded_word_ids_list internally, which is not in the batch dict.
+        # If you were adding 'word_ids': torch.tensor(...) earlier, ensure it's removed or handled.
+
         return batch

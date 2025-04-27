@@ -28,8 +28,21 @@ def train_model(mlm_prob: float = 0.15):
         return tokenized_output
     
     for curricula in ["level_1", "level_2", "level_3", "level_4", "level_5"]:
+        # Load the dataset *before* deciding on the collator
+        lm_dataset = load_dataset("text", data_files={"train": f"{data_folder}/train.train", "val":f"{data_folder}/dev.dev"}) 
+        lm_dataset = lm_dataset.map(
+            preprocess_function,
+            batched=True,
+            num_proc=4,
+        )
+
         if curricula == "level_5":
             data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm_probability=mlm_prob)
+            # Remove columns incompatible with the default collator *after* mapping
+            columns_to_remove = [col for col in ["text", "word_ids"] if col in lm_dataset["train"].column_names]
+            if columns_to_remove:
+                print(f"Level 5: Removing columns {columns_to_remove} for default collator.")
+                lm_dataset = lm_dataset.remove_columns(columns_to_remove)
             num_train_epochs = 1
         else:
             # Load weights from the JSON configuration file
@@ -57,14 +70,6 @@ def train_model(mlm_prob: float = 0.15):
             )
             num_train_epochs = 2
 
-        
-        lm_dataset = load_dataset("text", data_files={"train": f"{data_folder}/train.train", "val":f"{data_folder}/dev.dev"}) 
-        lm_dataset = lm_dataset.map(
-            preprocess_function,
-            batched=True,
-            num_proc=4,
-        )
-
         training_args = TrainingArguments(
             output_dir="curriculum_learning",
             eval_strategy="epoch",
@@ -73,8 +78,8 @@ def train_model(mlm_prob: float = 0.15):
             weight_decay=0.01,
             push_to_hub=False,
             save_strategy="epoch",
-            per_device_train_batch_size=8,
-            per_device_eval_batch_size=8,
+            per_device_train_batch_size=32,
+            per_device_eval_batch_size=32,
             remove_unused_columns=False
         )
 
