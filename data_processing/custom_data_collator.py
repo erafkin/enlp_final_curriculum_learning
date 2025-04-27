@@ -58,41 +58,41 @@ class UsasTagAwareDataCollator(DataCollatorForLanguageModeling):
         
         # Default weights for POS tags if not provided
         self.pos_tag_weights = pos_tag_weights or {
-            "NOUN": 2.0,     # Nouns are masked more frequently
-            "VERB": 1.5,     # Verbs are masked more frequently
-            "ADJ": 1.5,      # Adjectives are masked more frequently
-            "ADV": 1.2,      # Adverbs are masked more frequently
-            "PRON": 0.8,     # Pronouns are masked less frequently
-            "DET": 0.5,      # Determiners are masked less frequently
-            "ADP": 0.5,      # Prepositions are masked less frequently
-            "CCONJ": 0.3,    # Conjunctions are masked less frequently
-            "PUNCT": 0.1,    # Punctuation is rarely masked
+            "NOUN": 0.15,     # Nouns are masked more frequently
+            "VERB": 0.15,     # Verbs are masked more frequently
+            "ADJ": 0.15,      # Adjectives are masked more frequently
+            "ADV": 0.15,      # Adverbs are masked more frequently
+            "PRON": 0.15,     # Pronouns are masked less frequently
+            "DET": 0.15,      # Determiners are masked less frequently
+            "ADP": 0.15,      # Prepositions are masked less frequently
+            "CCONJ": 0.15,    # Conjunctions are masked less frequently
+            "PUNCT": 0.15,    # Punctuation is rarely masked
         }
         
         # Default weights for USAS semantic tags if not provided
         # These are based on USAS major categories
         self.sem_tag_weights = sem_tag_weights or {
-            "A": 2.0,    # General and abstract terms (most conceptual)
-            "B": 2.0,    # The body and the individual
-            "C": 1.8,    # Arts and crafts
-            "E": 1.8,    # Emotion
-            "F": 1.8,    # Food and farming
-            "G": 1.8,    # Government and public
-            "H": 1.8,    # Architecture, housing and the home
-            "I": 1.8,    # Money and commerce
-            "K": 1.8,    # Entertainment, sports and games
-            "L": 1.8,    # Life and living things
-            "M": 1.8,    # Movement, location, travel and transport
-            "N": 1.8,    # Numbers and measurement
-            "O": 1.8,    # Substances, materials, objects and equipment
-            "P": 1.5,    # Education
-            "Q": 1.5,    # Language and communication
-            "S": 1.5,    # Social actions, states and processes
-            "T": 1.5,    # Time
-            "W": 1.5,    # World and environment
-            "X": 1.0,    # Psychological actions, states and processes
-            "Y": 0.8,    # Science and technology
-            "Z": 0.5,    # Names and grammar (least conceptual)
+            "A": 0.15,    # General and abstract terms (most conceptual)
+            "B": 0.15,    # The body and the individual
+            "C": 0.15,    # Arts and crafts
+            "E": 0.15,    # Emotion
+            "F": 0.15,    # Food and farming
+            "G": 0.15,    # Government and public
+            "H": 0.15,    # Architecture, housing and the home
+            "I": 0.15,    # Money and commerce
+            "K": 0.15,    # Entertainment, sports and games
+            "L": 0.15,    # Life and living things
+            "M": 0.15,    # Movement, location, travel and transport
+            "N": 0.15,    # Numbers and measurement
+            "O": 0.15,    # Substances, materials, objects and equipment
+            "P": 0.15,    # Education
+            "Q": 0.15,    # Language and communication
+            "S": 0.15,    # Social actions, states and processes
+            "T": 0.15,    # Time
+            "W": 0.15,    # World and environment
+            "X": 0.15,    # Psychological actions, states and processes
+            "Y": 0.15,    # Science and technology
+            "Z": 0.15,    # Names and grammar (least conceptual)
         }
         
         # Initialize spaCy and PyMUSAS following official documentation
@@ -237,13 +237,13 @@ class UsasTagAwareDataCollator(DataCollatorForLanguageModeling):
                     if pos_cursor < len(batch_pos_tags[i]):
                         pos_tag = batch_pos_tags[i][pos_cursor]
                         if pos_tag in self.pos_tag_weights:
-                            token_probabilities[i, j] *= self.pos_tag_weights[pos_tag]
+                            token_probabilities[i, j] = self.pos_tag_weights[pos_tag]
                     
                     # Apply USAS semantic tag-based weights when possible
                     if pos_cursor < len(batch_usas_tags[i]):
                         usas_tag = batch_usas_tags[i][pos_cursor]
                         if usas_tag and usas_tag in self.sem_tag_weights:
-                            token_probabilities[i, j] *= self.sem_tag_weights[usas_tag]
+                            token_probabilities[i, j] = self.sem_tag_weights[usas_tag]
                     
                     pos_cursor += 1
         

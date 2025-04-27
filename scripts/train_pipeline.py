@@ -1,8 +1,13 @@
 
 from transformers import RobertaTokenizerFast, AutoModelForMaskedLM, RobertaConfig, DataCollatorForLanguageModeling, Trainer, TrainingArguments
 import os
+import json
 from datasets import load_dataset
 import math
+# add the path to the custom data collator
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from data_processing.custom_data_collator import UsasTagAwareDataCollator
 
 def train_model(mlm_prob: float = 0.15):
     tokenizer = RobertaTokenizerFast.from_pretrained("phueb/BabyBERTa-1")
@@ -14,8 +19,37 @@ def train_model(mlm_prob: float = 0.15):
     def preprocess_function(examples):
         return tokenizer(examples["text"], padding="max_length", truncation=True, max_length=128)
     
-    data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm_probability=mlm_prob)
-    for curricula in ["easy", "medium", "hard"]:
+    for curricula in ["level_1", "level_2", "level_3", "level_4", "level_5"]:
+        if curricula == "level_5":
+            data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm_probability=mlm_prob)
+            num_train_epochs = 1
+        else:
+            # Load weights from the JSON configuration file
+            config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 
+                                    "data_processing", f"{curricula}tag_weights_config.json")
+            try:
+                with open(config_path, 'r') as f:
+                    weights_config = json.load(f)
+                pos_tag_weights = weights_config.get("pos_tag_weights", {})
+                sem_tag_weights = weights_config.get("sem_tag_weights", {})
+                print(f"Loaded tag weights from: {config_path}")
+            except Exception as e:
+                print(f"Warning: Could not load tag weights from {config_path}: {e}")
+                print("Using default weights instead.")
+                pos_tag_weights = {}
+                sem_tag_weights = {}
+            
+            # Use the custom USAS-aware data collator with loaded weights
+            data_collator = UsasTagAwareDataCollator(
+                tokenizer=tokenizer, 
+                mlm_probability=mlm_prob,
+                pos_tag_weights=pos_tag_weights,
+                sem_tag_weights=sem_tag_weights,
+                spacy_model="en_core_web_sm"
+            )
+            num_train_epochs = 2
+
+        
         lm_dataset = load_dataset("text", data_files={"train": f"{data_folder}/train.train", "val":f"{data_folder}/dev.dev"}) 
         lm_dataset = lm_dataset.map(
             preprocess_function,
@@ -27,10 +61,12 @@ def train_model(mlm_prob: float = 0.15):
             output_dir="curriculum_learning",
             eval_strategy="epoch",
             learning_rate=2e-5,
-            num_train_epochs=1, # TODO: increase?
+            num_train_epochs=num_train_epochs,
             weight_decay=0.01,
             push_to_hub=False,
-            save_strategy="epoch"
+            save_strategy="epoch",
+            per_device_train_batch_size=8,
+            per_device_eval_batch_size=8,
         )
 
         trainer = Trainer(
