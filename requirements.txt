@@ -2,3 +2,5 @@ transformers[torch]
 evaluate
 datasets
 pandas
+spacy
+pymusas
