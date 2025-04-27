@@ -14,9 +14,9 @@ def train_model(mlm_prob: float = 0.15):
     model = AutoModelForMaskedLM.from_config(configuration)
 
     tokenizer.pad_token = tokenizer.eos_token
-    data_folder = "data/aggregated_test"
+    data_folder = "data/aggregated"
     
-    # Modified preprocess_function to return word_ids and keep original text
+    # Modified preprocess_function to manually add word_ids
     def preprocess_function(examples):
         tokenized_output = tokenizer(
             examples["text"], 
@@ -24,7 +24,15 @@ def train_model(mlm_prob: float = 0.15):
             truncation=True, 
             max_length=128
         )
-        tokenized_output["text"] = examples["text"]
+        
+        # Manually get word_ids for each sequence in the batch
+        word_ids_list = []
+        for i in range(len(examples["text"])):
+             word_ids_list.append(tokenized_output.word_ids(batch_index=i))
+
+        # Add the list of word_ids to the output dictionary
+        tokenized_output["word_ids"] = word_ids_list
+        tokenized_output["text"] = examples["text"] # Keep text for custom collator
         return tokenized_output
     
     for curricula in ["level_1", "level_2", "level_3", "level_4", "level_5"]:

@@ -166,6 +166,25 @@ class UsasTagAwareDataCollator(DataCollatorForLanguageModeling):
 
             num_spacy_tags = len(pos_tags)
 
+            # --- DEBUGGING START ---
+            # if i == 0: # Print only for first sequence
+            #     for j in range(min(10, seq_length)): # First 10 tokens
+            #         print(f"--- Token {j} ---")
+            #         print(f"word_ids[{j}]: {word_ids[j]}")
+            #         if word_ids[j] is not None and word_ids[j] < num_spacy_tags:
+            #             print(f"pos_tags[{word_ids[j]}]: {pos_tags[word_ids[j]]}")
+            #             print(f"usas_tags[{word_ids[j]}]: {usas_tags[word_ids[j]]}")
+            #             print(f"pos_tag in weights: {pos_tags[word_ids[j]] in self.pos_tag_weights}")
+            #             if self.pymusas_available:
+            #                  print(f"usas_tag in weights: {usas_tags[word_ids[j]] in self.sem_tag_weights}")
+            #             else:
+            #                  print("PyMUSAS not available")
+            #         elif word_ids[j] is None:
+            #             print("Special token or padding")
+            #         else:
+            #             print("word_idx out of bounds for tags")
+            # --- DEBUGGING END ---
+
             for j in range(seq_length):
                 word_idx = word_ids[j] # word_ids are already aligned with input_ids by padding
 
@@ -182,20 +201,36 @@ class UsasTagAwareDataCollator(DataCollatorForLanguageModeling):
                     pos_tag = pos_tags[word_idx]
                     if pos_tag and pos_tag in self.pos_tag_weights:
                         current_prob = self.pos_tag_weights[pos_tag]
+                        # --- DEBUGGING --- 
+                        # if i == 0 and j < 10: print(f"Applied POS weight: {current_prob}")
+                        # -----------------
 
-                    # Apply USAS weight
-                    if self.pymusas_available:
+                    # Apply USAS weight (potentially overriding POS weight if both apply)
+                    if self.pymusas_available and current_prob == 0.15: # Only apply if not already set
                         usas_tag = usas_tags[word_idx]
                         if usas_tag and usas_tag in self.sem_tag_weights:
                             current_prob = self.sem_tag_weights[usas_tag]
+                            # --- DEBUGGING --- 
+                            # if i == 0 and j < 10: print(f"Applied USAS weight: {current_prob}")
+                            # -----------------
 
                     # Assign the calculated probability (clamped)
                     token_probabilities[i, j] = max(0.0, min(1.0, current_prob))
+                    # print(f"Token {j} (word_idx {word_idx}): pos_tag {pos_tag}, usas_tag {usas_tag}, probability {token_probabilities[i, j]}, current_prob {current_prob}")
                 else:
                     # Word index out of bounds for tags (e.g., due to truncation differences)
                     # Keep base probability (already set)
-                    pass
+                    # --- DEBUGGING --- 
+                    # if i == 0 and j < 10: print(f"word_idx {word_idx} >= num_spacy_tags {num_spacy_tags}, using base prob.")
+                    # -----------------
+                    pass # Explicitly pass to indicate default probability is kept
 
+        # --- DEBUGGING --- 
+        # if i == 0: # Print final probabilities for the first sequence
+        #      print("\nFinal token_probabilities (first sequence sample):", token_probabilities[i, :20])
+        #      print("POS Weights Keys:", self.pos_tag_weights.keys())
+        #      print("SEM Weights Keys:", self.sem_tag_weights.keys())
+        # -----------------
         return token_probabilities
 
     def __call__(self, features: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -241,11 +276,15 @@ class UsasTagAwareDataCollator(DataCollatorForLanguageModeling):
 
         # 3. Get spaCy tags using the original texts
         batch_pos_tags, batch_usas_tags = self.get_token_tags_batch(texts_list)
+        # print(f"POS tags: {batch_pos_tags}")
+        # print(f"USAS tags: {batch_usas_tags}")
 
         # 4. Calculate token-specific masking probabilities using padded word_ids list
         token_probabilities = self.calculate_masking_probabilities(
             batch, padded_word_ids_list, batch_pos_tags, batch_usas_tags
         )
+        # print(f"Token probabilities: {token_probabilities}")
+        # print(f"Token probabilities: {token_probabilities[0]}")
 
         # 5. Perform masking based on calculated probabilities
         inputs = batch['input_ids'].clone()
@@ -254,6 +293,7 @@ class UsasTagAwareDataCollator(DataCollatorForLanguageModeling):
         # Sample mask based on token probabilities
         probability_matrix = torch.rand_like(inputs, dtype=torch.float)
         masked_indices = probability_matrix < token_probabilities
+        # print(f"Masked indices: {masked_indices}")
 
         # Set labels for non-masked tokens to -100
         labels[~masked_indices] = -100
@@ -269,6 +309,9 @@ class UsasTagAwareDataCollator(DataCollatorForLanguageModeling):
         # Update batch with masked inputs and labels
         batch['input_ids'] = inputs
         batch['labels'] = labels
+        # print(f"Masked inputs: {inputs}")
+        # print(f"Labels: {labels}")
+        # input("Press Enter to continue...")
 
         # Remove original text field as it's not needed by the model and might cause issues
         if 'text' in batch:
