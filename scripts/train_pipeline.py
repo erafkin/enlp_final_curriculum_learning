@@ -1,4 +1,3 @@
-
 from transformers import RobertaTokenizerFast, AutoModelForMaskedLM, RobertaConfig, DataCollatorForLanguageModeling, Trainer, TrainingArguments
 import os
 import json
@@ -16,8 +15,17 @@ def train_model(mlm_prob: float = 0.15):
 
     tokenizer.pad_token = tokenizer.eos_token
     data_folder = "data/aggregated_test"
+    
+    # Modified preprocess_function to return word_ids and keep original text
     def preprocess_function(examples):
-        return tokenizer(examples["text"], padding="max_length", truncation=True, max_length=128)
+        tokenized_output = tokenizer(
+            examples["text"], 
+            padding="max_length", 
+            truncation=True, 
+            max_length=128
+        )
+        tokenized_output["text"] = examples["text"]
+        return tokenized_output
     
     for curricula in ["level_1", "level_2", "level_3", "level_4", "level_5"]:
         if curricula == "level_5":
@@ -26,7 +34,7 @@ def train_model(mlm_prob: float = 0.15):
         else:
             # Load weights from the JSON configuration file
             config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 
-                                    "data_processing", f"{curricula}tag_weights_config.json")
+                                    "data_processing", f"{curricula}_tag_weights_config.json")
             try:
                 with open(config_path, 'r') as f:
                     weights_config = json.load(f)
@@ -67,6 +75,7 @@ def train_model(mlm_prob: float = 0.15):
             save_strategy="epoch",
             per_device_train_batch_size=8,
             per_device_eval_batch_size=8,
+            remove_unused_columns=False
         )
 
         trainer = Trainer(
