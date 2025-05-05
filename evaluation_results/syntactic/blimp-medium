@@ -1,0 +1,81 @@
+|                                Tasks                                |Version|Filter|n-shot|Metric|Value |   |Stderr|
+|---------------------------------------------------------------------|-------|------|-----:|------|-----:|---|-----:|
+|blimp_supplement                                                     |N/A    |none  |     0|acc   |0.4439|±  |0.0068|
+| - blimp_supplement_hypernym                                         |      1|none  |     0|acc   |0.5202|±  |0.0172|
+| - blimp_supplement_qa_congruence_easy                               |      1|none  |     0|acc   |0.3438|±  |0.0598|
+| - blimp_supplement_qa_congruence_tricky                             |      1|none  |     0|acc   |0.3515|±  |0.0373|
+| - blimp_supplement_subject_aux_inversion                            |      1|none  |     0|acc   |0.5968|±  |0.0079|
+| - blimp_supplement_turn_taking                                      |      1|none  |     0|acc   |0.4071|±  |0.0294|
+|blimp_filtered                                                       |N/A    |none  |     0|acc   |0.4874|±  |0.0019|
+| - blimp_adjunct_island_filtered                                     |      1|none  |     0|acc   |0.6013|±  |0.0161|
+| - blimp_anaphor_gender_agreement_filtered                           |      1|none  |     0|acc   |0.6941|±  |0.0148|
+| - blimp_anaphor_number_agreement_filtered                           |      1|none  |     0|acc   |0.6445|±  |0.0157|
+| - blimp_animate_subject_passive_filtered                            |      1|none  |     0|acc   |0.6190|±  |0.0162|
+| - blimp_animate_subject_trans_filtered                              |      1|none  |     0|acc   |0.6826|±  |0.0153|
+| - blimp_causative_filtered                                          |      1|none  |     0|acc   |0.4768|±  |0.0175|
+| - blimp_complex_NP_island_filtered                                  |      1|none  |     0|acc   |0.5083|±  |0.0172|
+| - blimp_coordinate_structure_constraint_complex_left_branch_filtered|      1|none  |     0|acc   |0.6645|±  |0.0157|
+| - blimp_coordinate_structure_constraint_object_extraction_filtered  |      1|none  |     0|acc   |0.4057|±  |0.0159|
+| - blimp_determiner_noun_agreement_1_filtered                        |      1|none  |     0|acc   |0.5242|±  |0.0164|
+| - blimp_determiner_noun_agreement_2_filtered                        |      1|none  |     0|acc   |0.4995|±  |0.0164|
+| - blimp_determiner_noun_agreement_irregular_1_filtered              |      1|none  |     0|acc   |0.5242|±  |0.0192|
+| - blimp_determiner_noun_agreement_irregular_2_filtered              |      1|none  |     0|acc   |0.4024|±  |0.0171|
+| - blimp_determiner_noun_agreement_with_adj_2_filtered               |      1|none  |     0|acc   |0.5420|±  |0.0163|
+| - blimp_determiner_noun_agreement_with_adj_irregular_1_filtered     |      1|none  |     0|acc   |0.5571|±  |0.0186|
+| - blimp_determiner_noun_agreement_with_adj_irregular_2_filtered     |      1|none  |     0|acc   |0.4190|±  |0.0170|
+| - blimp_determiner_noun_agreement_with_adjective_1_filtered         |      1|none  |     0|acc   |0.5005|±  |0.0164|
+| - blimp_distractor_agreement_relational_noun_filtered               |      1|none  |     0|acc   |0.4797|±  |0.0178|
+| - blimp_distractor_agreement_relative_clause_filtered               |      1|none  |     0|acc   |0.4822|±  |0.0169|
+| - blimp_drop_argument_filtered                                      |      1|none  |     0|acc   |0.6946|±  |0.0152|
+| - blimp_ellipsis_n_bar_1_filtered                                   |      1|none  |     0|acc   |0.7145|±  |0.0160|
+| - blimp_ellipsis_n_bar_2_filtered                                   |      1|none  |     0|acc   |0.2838|±  |0.0157|
+| - blimp_existential_there_object_raising_filtered                   |      1|none  |     0|acc   |0.6478|±  |0.0168|
+| - blimp_existential_there_quantifiers_1_filtered                    |      1|none  |     0|acc   |0.3226|±  |0.0153|
+| - blimp_existential_there_quantifiers_2_filtered                    |      1|none  |     0|acc   |0.0494|±  |0.0072|
+| - blimp_existential_there_subject_raising_filtered                  |      1|none  |     0|acc   |0.6883|±  |0.0152|
+| - blimp_expletive_it_object_raising_filtered                        |      1|none  |     0|acc   |0.6034|±  |0.0178|
+| - blimp_inchoative_filtered                                         |      1|none  |     0|acc   |0.4257|±  |0.0169|
+| - blimp_intransitive_filtered                                       |      1|none  |     0|acc   |0.5461|±  |0.0169|
+| - blimp_irregular_past_participle_adjectives_filtered               |      1|none  |     0|acc   |0.4870|±  |0.0161|
+| - blimp_irregular_past_participle_verbs_filtered                    |      1|none  |     0|acc   |0.4459|±  |0.0162|
+| - blimp_irregular_plural_subject_verb_agreement_1_filtered          |      1|none  |     0|acc   |0.4950|±  |0.0176|
+| - blimp_irregular_plural_subject_verb_agreement_2_filtered          |      1|none  |     0|acc   |0.5247|±  |0.0167|
+| - blimp_left_branch_island_echo_question_filtered                   |      1|none  |     0|acc   |0.7022|±  |0.0149|
+| - blimp_left_branch_island_simple_question_filtered                 |      1|none  |     0|acc   |0.5857|±  |0.0160|
+| - blimp_matrix_question_npi_licensor_present_filtered               |      1|none  |     0|acc   |0.1991|±  |0.0131|
+| - blimp_npi_present_1_filtered                                      |      1|none  |     0|acc   |0.1716|±  |0.0125|
+| - blimp_npi_present_2_filtered                                      |      1|none  |     0|acc   |0.2451|±  |0.0142|
+| - blimp_only_npi_licensor_present_filtered                          |      1|none  |     0|acc   |0.9206|±  |0.0091|
+| - blimp_only_npi_scope_filtered                                     |      1|none  |     0|acc   |0.2975|±  |0.0158|
+| - blimp_passive_1_filtered                                          |      1|none  |     0|acc   |0.5869|±  |0.0170|
+| - blimp_passive_2_filtered                                          |      1|none  |     0|acc   |0.5681|±  |0.0165|
+| - blimp_principle_A_c_command_filtered                              |      1|none  |     0|acc   |0.3541|±  |0.0156|
+| - blimp_principle_A_case_1_filtered                                 |      1|none  |     0|acc   |0.9901|±  |0.0033|
+| - blimp_principle_A_case_2_filtered                                 |      1|none  |     0|acc   |0.4284|±  |0.0164|
+| - blimp_principle_A_domain_1_filtered                               |      1|none  |     0|acc   |0.4923|±  |0.0165|
+| - blimp_principle_A_domain_2_filtered                               |      1|none  |     0|acc   |0.4863|±  |0.0165|
+| - blimp_principle_A_domain_3_filtered                               |      1|none  |     0|acc   |0.5537|±  |0.0162|
+| - blimp_principle_A_reconstruction_filtered                         |      1|none  |     0|acc   |0.5946|±  |0.0158|
+| - blimp_regular_plural_subject_verb_agreement_1_filtered            |      1|none  |     0|acc   |0.4764|±  |0.0168|
+| - blimp_regular_plural_subject_verb_agreement_2_filtered            |      1|none  |     0|acc   |0.4603|±  |0.0162|
+| - blimp_sentential_negation_npi_licensor_present_filtered           |      1|none  |     0|acc   |0.3471|±  |0.0157|
+| - blimp_sentential_negation_npi_scope_filtered                      |      1|none  |     0|acc   |0.6521|±  |0.0161|
+| - blimp_sentential_subject_island_filtered                          |      1|none  |     0|acc   |0.4974|±  |0.0161|
+| - blimp_superlative_quantifiers_1_filtered                          |      1|none  |     0|acc   |0.5720|±  |0.0158|
+| - blimp_superlative_quantifiers_2_filtered                          |      1|none  |     0|acc   |0.3053|±  |0.0147|
+| - blimp_tough_vs_raising_1_filtered                                 |      1|none  |     0|acc   |0.3608|±  |0.0156|
+| - blimp_tough_vs_raising_2_filtered                                 |      1|none  |     0|acc   |0.6924|±  |0.0152|
+| - blimp_transitive_filtered                                         |      1|none  |     0|acc   |0.5173|±  |0.0170|
+| - blimp_wh_island_filtered                                          |      1|none  |     0|acc   |0.0552|±  |0.0074|
+| - blimp_wh_questions_object_gap_filtered                            |      1|none  |     0|acc   |0.2549|±  |0.0149|
+| - blimp_wh_questions_subject_gap_filtered                           |      1|none  |     0|acc   |0.0290|±  |0.0056|
+| - blimp_wh_questions_subject_gap_long_distance_filtered             |      1|none  |     0|acc   |0.0607|±  |0.0082|
+| - blimp_wh_vs_that_no_gap_filtered                                  |      1|none  |     0|acc   |0.2915|±  |0.0155|
+| - blimp_wh_vs_that_no_gap_long_distance_filtered                    |      1|none  |     0|acc   |0.2823|±  |0.0152|
+| - blimp_wh_vs_that_with_gap_filtered                                |      1|none  |     0|acc   |0.7312|±  |0.0146|
+| - blimp_wh_vs_that_with_gap_long_distance_filtered                  |      1|none  |     0|acc   |0.7352|±  |0.0146|
+
+|     Groups     |Version|Filter|n-shot|Metric|Value |   |Stderr|
+|----------------|-------|------|-----:|------|-----:|---|-----:|
+|blimp_supplement|N/A    |none  |     0|acc   |0.4439|±  |0.0068|
+|blimp_filtered  |N/A    |none  |     0|acc   |0.4874|±  |0.0019|
