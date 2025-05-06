@@ -31,7 +31,7 @@ To generate data, download the BabyLM dataset and consolidate all of the seperat
 
 Then depending on which curriculum learning method you would like to train you model with, the `data_processing` folder contains scripts to split these data files into curricula. 
 - **Surprisal**: In order to split the data into curricula based on surprisal run `data_processing/surprisal_cl.py`. Note that it is currently set to use trigram probabilities calculated form the training data, but you can also swap out `surprisal_mode` to be `model` to retrieve surprisal scores for each input sentence based on BERT probabilities. Unfortunately resource and time constraints limited our ability to run the pipeline using BERT.
-- **Syntactic**: In order to split the data into curricula based on syntactic complexity, run `data_processing/syntactic_complexity.py`. You will probably need to install libraries like spacy into your virtual environment, but the code will run once the proper prerequisites are set in place. 
+ 
 
 To run the pipeline set the `data_folder` variable to the appropriate path and then run `python scripts/train_pipeline.py`. If you are using a VM that uses slurm to manage jobs, there is a training slurm script in `scripts/slurm`.
 
