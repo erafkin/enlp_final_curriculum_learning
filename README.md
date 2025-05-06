@@ -30,7 +30,10 @@ pip install -r requirements.txt
 To generate data, download the BabyLM dataset and consolidate all of the seperate data files into a single data file for each split called `split.split`--e.g. `train.train`, `dev.dev`, `test.test`.
 
 Then depending on which curriculum learning method you would like to train you model with, the `data_processing` folder contains scripts to split these data files into curricula. 
-- **Surprisal**: In order to split the data into curricula based on surprisal run `data_processing/surprisal_cl.py`. Note that it is currently set to use trigram probabilities calculated form the training data, but you can also swap out `surprisal_mode` to be `model` to retrieve surprisal scores for each input sentence based on BERT probabilities. Unfortunately resource and time constraints limited our ability to run the pipeline using BERT. 
+
+Due to the fact the our team members used different OSes to develop the code, some members would have slightly different ways of developing the pipeline.
+- **Surprisal**: In order to split the data into curricula based on surprisal run `data_processing/surprisal_cl.py`. Note that it is currently set to use trigram probabilities calculated form the training data, but you can also swap out `surprisal_mode` to be `model` to retrieve surprisal scores for each input sentence based on BERT probabilities. Unfortunately resource and time constraints limited our ability to run the pipeline using BERT.
+- **Concreteness**: First run the 'curriculum_splitting_concreteness.py' to split the data set based on concreteness score while keeping the 'brysbaert_2014_concreteness.csv' in the same folder. Then run the 'train_pipeline_concreteness.py' to start training the model.
 
 To run the pipeline set the `data_folder` variable to the appropriate path and then run `python scripts/train_pipeline.py`. If you are using a VM that uses slurm to manage jobs, there is a training slurm script in `scripts/slurm`.
 
