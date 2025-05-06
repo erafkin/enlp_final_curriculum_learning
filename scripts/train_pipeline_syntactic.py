@@ -10,7 +10,7 @@ def train_model(mlm_prob: float = 0.15):
     model = AutoModelForMaskedLM.from_config(configuration)
 
     tokenizer.pad_token = tokenizer.eos_token
-    data_folder = "./syntactic_curricula" #TODO Swap out with the folder where your curricula data are saved. Mine have "easy", "medium", "hard" folders and each of those have a train.train and dev.dev file
+    data_folder = "./syntactic_curricula" # Swapped out with the folder where my curricula data are saved.
     def preprocess_function(examples):
         return tokenizer(examples["text"], padding="max_length", truncation=True, max_length=128)
     
@@ -30,7 +30,7 @@ def train_model(mlm_prob: float = 0.15):
             output_dir="curriculum_learning",
             eval_strategy="epoch",
             learning_rate=2e-5,
-            num_train_epochs=3, # TODO: increase?
+            num_train_epochs=3, # increased to 3
             weight_decay=0.01,
             push_to_hub=False,
             save_strategy="epoch"
