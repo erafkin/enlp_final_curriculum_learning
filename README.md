@@ -4,7 +4,7 @@ For our final project we decided to explore the impact of curriculum learning fo
 1. **Surprisal**
     Surprisal theory posits that the amount of information contained in each word can be measured using surprisal (negative log probability). Studies on surprisal theory have shown that surprisal is a good predictor for longer reading and parsing times. This implies that surprisal is correlated with sentence difficulty. Therefore, the corpus can be divided into curricula with the easiest curriculum containing the phrases with the lowest surprisal. We will use surprisal calculated from trigram probabilities from the training set. 
 2. **Syntactic**
-    Syntactic complexity ordering, as a concept, is essentially about ranking sentences based on how complex their grammatical structure is. The data is typically sorted using a complexity score so that simpler sentences are used earlier in training and more complex sentences appear later in training. We will use spaCy to analyse the sentence structure in the training corpus for this approach
+    Syntactic complexity ordering, as a concept, is essentially about ranking sentences based on how complex their grammatical structure is. The data is typically sorted using a complexity score so that simpler sentences are used earlier in training and more complex sentences appear later in training. We will use spaCy to analyse the sentence structure in the training corpus for this approach.
 
 3. **MMM Theory**
     Maximize Minimal Means (MMM) is a curriculum learning strategy grounded in linguistic theories of language acquisition, which suggest that learners benefit from progressing from simpler to more complex structures. It does so by ranking sentences based on the average rarity of their syntactic (e.g., POS tags) and semantic (e.g., semantic role labels) features. Simpler, more frequent constructions are introduced earlier, while rarer, complex ones appear later. This mirrors how humans typically acquire language.
@@ -30,8 +30,11 @@ pip install -r requirements.txt
 To generate data, download the BabyLM dataset and consolidate all of the seperate data files into a single data file for each split called `split.split`--e.g. `train.train`, `dev.dev`, `test.test`.
 
 Then depending on which curriculum learning method you would like to train you model with, the `data_processing` folder contains scripts to split these data files into curricula. 
+
+Due to the fact the our team members used different OSes to develop the code, some members would have slightly different ways of developing the pipeline.
 - **Surprisal**: In order to split the data into curricula based on surprisal run `data_processing/surprisal_cl.py`. Note that it is currently set to use trigram probabilities calculated form the training data, but you can also swap out `surprisal_mode` to be `model` to retrieve surprisal scores for each input sentence based on BERT probabilities. Unfortunately resource and time constraints limited our ability to run the pipeline using BERT.
- 
+- **Syntactic**: In order to split the data into curricula based on syntactic complexity, run `data_processing/syntactic.py`. You would probably need to install some Python libraries like SpaCy or any other library that you're prompted to install on your virtual environment before running the program if they aren't installed already, but the code will run as intended once they are available. Once that's done, you can run train_pipeline_syntactic.py, which is essentially the same as train_pipeline.py with one small difference that is outlined in one of the comments in train_pipeline_syntactic.py where the difference occurs
+- **Concreteness**: First run the 'curriculum_splitting_concreteness.py' to split the data set based on concreteness score while keeping the 'brysbaert_2014_concreteness.csv' in the same folder. Then run the 'train_pipeline_concreteness.py' to start training the model.
 
 To run the pipeline set the `data_folder` variable to the appropriate path and then run `python scripts/train_pipeline.py`. If you are using a VM that uses slurm to manage jobs, there is a training slurm script in `scripts/slurm`.
 
