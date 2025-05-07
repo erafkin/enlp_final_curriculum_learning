@@ -244,11 +244,8 @@ class UsasTagAwareDataCollator(DataCollatorForLanguageModeling):
         # 2. Pad the features using the default tokenizer.pad logic
         # Exclude 'text' as it's not tensorizable for padding.
         # 'word_ids' might also cause issues if not handled correctly by tokenizer.pad.
-        # Let's pad input_ids, attention_mask etc., first.
         features_for_padding = []
         for f in features:
-            # Keep only keys that are typically padded (like input_ids, attention_mask)
-            # Exclude 'text', 'word_ids' for now.
             padded_f = {k: v for k, v in f.items() if k in self.tokenizer.model_input_names or k == 'attention_mask'}
             features_for_padding.append(padded_f)
 
@@ -270,7 +267,6 @@ class UsasTagAwareDataCollator(DataCollatorForLanguageModeling):
         # Add padded word_ids to the batch if needed elsewhere, though we use the list directly
         # batch['word_ids'] = torch.tensor(padded_word_ids_list) # This might fail if None is present
 
-        # If MLM is disabled, return the padded batch
         if not self.mlm:
             return batch
 
@@ -318,6 +314,5 @@ class UsasTagAwareDataCollator(DataCollatorForLanguageModeling):
             del batch['text']
         # Also remove word_ids if it was added as a tensor and might be problematic
         # Note: We used padded_word_ids_list internally, which is not in the batch dict.
-        # If you were adding 'word_ids': torch.tensor(...) earlier, ensure it's removed or handled.
-
+        
         return batch

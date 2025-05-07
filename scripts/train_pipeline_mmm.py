@@ -68,7 +68,6 @@ def train_model(mlm_prob: float = 0.15):
                 pos_tag_weights = {}
                 sem_tag_weights = {}
             
-            # Use the custom USAS-aware data collator with loaded weights
             data_collator = UsasTagAwareDataCollator(
                 tokenizer=tokenizer, 
                 mlm_probability=mlm_prob,
