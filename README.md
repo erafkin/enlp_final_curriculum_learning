@@ -1,5 +1,5 @@
 # ENLP Final Curriculum Learning
-For our final project we decided to explore the impact of curriculum learning for the BabyLM challenge. We selected different methods for creating our curricula and finetuned a [BabyBERTa](https://huggingface.co/phueb/BabyBERTa-1) model on increasingly more difficult data. The three methods we chose are: 
+For our final project we decided to explore the impact of curriculum learning for the [BabyLM challenge](https://babylm.github.io/). We selected different methods for creating our curricula and finetuned a [BabyBERTa](https://huggingface.co/phueb/BabyBERTa-1) model on increasingly more difficult data. The three methods we chose are: 
 
 1. **Surprisal**
     Surprisal theory posits that the amount of information contained in each word can be measured using surprisal (negative log probability). Studies on surprisal theory have shown that surprisal is a good predictor for longer reading and parsing times. This implies that surprisal is correlated with sentence difficulty. Therefore, the corpus can be divided into curricula with the easiest curriculum containing the phrases with the lowest surprisal. We will use surprisal calculated from trigram probabilities from the training set. 
